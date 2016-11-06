@@ -15,8 +15,9 @@
 				</memory>
 			</memory_block>
 			<alphabet>
-				<abc name="Letter" short_name="L" description="Содержит буквы латинского алфавита"></abc>
+				<abc name="Letter" short_name="L">"Содержит буквы латинского алфавита"></abc>
 			</alphabet>
+			<tape>SomethigInTheTape</tape>
 		</descriptive_part>
 		<alg>
 			<arm begin = "0">

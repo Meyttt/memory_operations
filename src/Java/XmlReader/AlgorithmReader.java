@@ -3,6 +3,10 @@ import Logic.*;
 
 import Logic.Arm;
 import Memories.*;
+import Other.Storage;
+import Other.Tape;
+import com.sun.deploy.util.ArrayUtil;
+import org.jcp.xml.dsig.internal.dom.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -14,19 +18,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 
 /**
  * Created by master on 31.10.2016.
  */
 public class AlgorithmReader {
-    public Map<String,Arm> readAlgorithm() throws IOException, SAXException, ParserConfigurationException {
-        Map<String,Arm> arms = new HashMap<>();
-        Map<String, Memory> memoriesMap = new HashMap<>();
+    public Storage readAlgorithm() throws IOException, SAXException, ParserConfigurationException {
+        HashMap<String,Arm> arms = new HashMap<>();
+        HashMap<String, Memory> memoriesMap = new HashMap<>();
         DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
         f.setValidating(false);
         DocumentBuilder builder = f.newDocumentBuilder();
@@ -78,59 +79,95 @@ public class AlgorithmReader {
 
 
         NodeList nodeList = document.getElementsByTagName("arm");
-        for(int i=0;i<nodeList.getLength();i++){
-            ArrayList<ArmLine> armLines=new ArrayList<>();
-            Logic.Condition condition= null;
+        for(int i=0;i<nodeList.getLength();i++) {
+            ArrayList<ArmLine> armLines = new ArrayList<>();
+            Logic.Condition condition = null;
             ArrayList<Statement> statements = new ArrayList<>();
-            Node armNode= nodeList.item(i);
+            Node armNode = nodeList.item(i);
             String nodeNumber = armNode.getAttributes().getNamedItem("begin").getNodeValue();
             NodeList edges = armNode.getChildNodes();
-            for(int j=0;j<edges.getLength();j++){
-                Node edge=edges.item(j);
-                if(edge.hasChildNodes()){
-                    String endNumber=edge.getAttributes().getNamedItem("end").getNodeValue();
-                    NodeList allLines=edge.getChildNodes();
-                        for(int k=0;k<allLines.getLength();k++){
-                            Node line = allLines.item(k);
-                            switch(line.getNodeName()){
-                                case("predicate"):
-                                    NodeList lineNodes = line.getChildNodes();
-                                    for(int l=0;l<lineNodes.getLength();l++){
-                                        if(lineNodes.item(l).hasChildNodes()) {
-                                            switch (lineNodes.item(l).getNodeName()){
-                                                case ("alphabet"):{
-                                                    condition = new Logic.Condition(null,new Alphabet(lineNodes.item(l).getFirstChild().getNodeValue()),endNumber);
-                                                    break;
-                                                }
-                                                case("predicateText"):{
-                                                    condition = new Logic.Condition(lineNodes.item(l).getFirstChild().getNodeValue(),null,endNumber);
-                                                    break;
-                                                }
-                                                case("const"):{
-                                                    //TODO:Реализуй меня полностью, но сначала в Condition
-                                                    break;
-                                                }
+            for (int j = 0; j < edges.getLength(); j++) {
+                Node edge = edges.item(j);
+                if (edge.hasChildNodes()) {
+                    String endNumber = edge.getAttributes().getNamedItem("end").getNodeValue();
+                    NodeList allLines = edge.getChildNodes();
+                    for (int k = 0; k < allLines.getLength(); k++) {
+                        Node line = allLines.item(k);
+                        switch (line.getNodeName()) {
+                            case ("predicate"):
+                                NodeList lineNodes = line.getChildNodes();
+                                for (int l = 0; l < lineNodes.getLength(); l++) {
+                                    if (lineNodes.item(l).hasChildNodes()) {
+                                        switch (lineNodes.item(l).getNodeName()) {
+                                            case ("alphabet"): {
+                                                condition = new Logic.Condition(null, new Alphabet(lineNodes.item(l).getFirstChild().getNodeValue()), endNumber);
+                                                break;
+                                            }
+                                            case ("predicateText"): {
+                                                condition = new Logic.Condition(lineNodes.item(l).getFirstChild().getNodeValue(), null, endNumber);
+                                                break;
+                                            }
+                                            case ("const"): {
+                                                //TODO:Реализуй меня полностью, но сначала в Condition
+                                                break;
                                             }
                                         }
                                     }
-
-                                break;
-                                case("operation"):{
-                                    NamedNodeMap atributes=line.getAttributes();
-                                    statements.add(new Statement(atributes.getNamedItem("left").getNodeValue(),
-                                            Statement.getOperator(atributes.getNamedItem("operator").getNodeValue().toCharArray()),atributes.getNamedItem("right").getNodeValue()));
-
                                 }
+                                break;
+                            case ("operation"): {
+                                NamedNodeMap atributes = line.getAttributes();
+                                statements.add(new Statement(atributes.getNamedItem("left").getNodeValue(),
+                                        Statement.getOperator(atributes.getNamedItem("operator").getNodeValue().toCharArray()), atributes.getNamedItem("right").getNodeValue()));
                             }
-
-
                         }
-                        armLines.add(new ArmLine(nodeNumber,condition,statements));
+                    }
+                    armLines.add(new ArmLine(nodeNumber, condition, statements));
                 }
             }
-            arms.put(nodeNumber,new Arm(nodeNumber,armLines));
+            arms.put(nodeNumber, new Arm(nodeNumber, armLines));
         }
-    return arms;
+        Tape tape = null;
+    HashMap<String,Alphabet> alphabetMap=new HashMap<>();
+    NodeList description = document.getElementsByTagName("descriptive_part");
+    for(int i=0;i<description.getLength();i++){
+        if(description.item(i).hasChildNodes()){
+            Node descriptive=description.item(i);
+            NodeList descrParts=descriptive.getChildNodes();
+            for(int j=0;j<descrParts.getLength();j++){
+                if(descrParts.item(j).hasChildNodes()){
+                    switch (descrParts.item(j).getNodeName()){
+                        case("alphabet"):{
+                            NodeList alphNodes = descrParts.item(j).getChildNodes();
+                            for(int b=0;b<alphNodes.getLength();b++){
+                                if(alphNodes.item(b).hasChildNodes()){
+                                    NamedNodeMap alphAtr= alphNodes.item(b).getAttributes();
+                                    alphabetMap.put(alphAtr.getNamedItem("name").getNodeValue(),
+                                            new Alphabet(alphAtr.getNamedItem("name").getNodeValue(),alphAtr.getNamedItem("short_name").getNodeValue(),null));
+                                }
+                            }
+                            break;
+                        }
+                        case("tape"):{
+                            String tapeString = descrParts.item(j).getFirstChild().getNodeValue();
+                            char[] tapeChar = tapeString.toCharArray();
+                            Character[] tapeCharacter = new Character[tapeChar.length];
+                            for(int g=0;g<tapeCharacter.length;g++){
+                                tapeCharacter[g]=new Character(tapeChar[g]);
+                            }
+
+                            tape=new Tape(new LinkedList<Character>(Arrays.asList(tapeCharacter)));
+                            //LinkedList<Character> tapeList= new LinkedList<Character>(Arrays.asList(tapeString.toCharArray()));
+                            //tape=new Tape(new LinkedList<Character>(Arrays.asList(descrParts.item(j).getNodeValue().toCharArray()));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return new Storage(arms,memoriesMap,alphabetMap,tape);
     }
 
     public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {

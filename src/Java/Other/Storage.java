@@ -1,4 +1,5 @@
 package Other;
+import Logic.Arm;
 import Memories.*;
 import Logic.ArmLine;
 import Memories.Memory;
@@ -14,14 +15,18 @@ public class Storage {
     /**
      * Ключ - значение номера/названия вершины
      */
-    HashMap<String,ArrayList<ArmLine>> arms;
+    HashMap<String, Arm> arms;
     /**
      * Ключ - название памяти(для вагона - полное название, например 'ЛВ*ПВ'
      */
-    //TODO:Реализовать пустые конструкторы для всех памятей(только с названиями)
     HashMap<String, Memory> memories;
-    //TODO: Реализовать алфавит(работа с регулярными выражениями) ОБНОВЛЕНИЕ: Алфавит реализован в виде памяти
-    HashMap<String,Alphabet> alphabets;
+    HashMap<String, Alphabet> alphabets;
+    Tape tape;
 
-
+    public Storage(HashMap<String, Arm> arms, HashMap<String, Memory> memories, HashMap<String, Alphabet> alphabets, Tape tape) {
+        this.arms = arms;
+        this.memories = memories;
+        this.alphabets = alphabets;
+        this.tape = tape;
+    }
 }

@@ -14,7 +14,11 @@ import java.util.Queue;
  * Чтение из ленты осуществляется методом read;
  */
 public class Tape {
-    static Queue<Character> tape=new LinkedList<>(Arrays.asList('a','b','c','d','e','f'));
+    public Tape(Queue<Character> tape) {
+        this.tape = tape;
+    }
+
+    Queue<Character> tape=new LinkedList<>();
     Iterator<Character> it = tape.iterator();
     public Character read(){
         return it.next(); // ОБНОВЛЕНИЕ: Я же правильно понимаю, что указатель тут тоже перемещается?
