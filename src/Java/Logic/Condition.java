@@ -41,6 +41,7 @@ public class Condition {
 
 //  2. 3 пункт: сравниваем ленту ввода с памятью.
     boolean compare(Memory memory, Tape tape) {
+
         for(int i = 0; i < memory.read().length(); i++) {
             if (!(memory.read().charAt(i) == tape.read())) {
                 aBoolean = false;

@@ -7,35 +7,36 @@ import Memories.Memory;
  * Правый - памятью или выражением. Проблема аналогичная с алафвитом.
  */
 public class Statement {
-    Memory leftArg;
+    String leftArg;
     Operator operator;
-    RightSide rightArg;
+    String rightArg;
+    public static Operator getOperator(char[] chars){
+        switch (chars.length){
+            case(3):
+                if(chars[0]=='/'){
+                    return new Operator(chars[0],(""+chars[1]+chars[2]).toCharArray());
+                }else
+                    return new Operator((""+chars[0]+chars[1]).toCharArray(),chars[2]);
+            case (4):
+                return new Operator(chars[0],(""+chars[1]+chars[2]).toCharArray(),chars[3]);
+            case (2):
+                return new Operator(chars);
+            default:
+                return null;
+
+        }
+    }
     /**
      * У нас есть 2 базовых вида выражений: чтение/запись (<-, ->), для каждого из которых можно задать очистку ячейки памяти.
      * Т.о., у нас есть три основных поля для этого варианта (очистка левого операнда, стрелка, очистка правого операнда)
      * Для второго варианта(=^ вставка, =. добавление,&= поиск по совпадению, &~ поиск по несовпадению) нам нужно только одно поле, поэтому 1 и 3 заполняются null-ами.
      * ОБНОВЛЕНИЕ: надо, по идее, еще учитывать такие операторы как ==, !=, <, <=, >, >=, они, как и &= и &~ становятся в одно поле.
      */
-    static class Operator{
+    public static class Operator{
         Character left;
         char[] middle;
         Character right;
-        public Operator getOperator(char[] chars){
-            switch (chars.length){
-                case(3):
-                    if(chars[0]=='/'){
-                        return new Operator(chars[0],(""+chars[1]+chars[2]).toCharArray());
-                    }else
-                        return new Operator((""+chars[0]+chars[1]).toCharArray(),chars[2]);
-                case (4):
-                    return new Operator(chars[0],(""+chars[1]+chars[2]).toCharArray(),chars[3]);
-                case (2):
-                    return new Operator(chars);
-                default:
-                    return null;
 
-            }
-        }
         private Operator(char ch1, char[] ch2, char ch3){
             left = ch1;
             middle = ch2;
@@ -70,7 +71,7 @@ public class Statement {
             memoryRight=rightSide;
         }
     }
-    public Statement(Memory leftArg, Operator operator, RightSide rightArg){
+    public Statement(String leftArg, Operator operator, String rightArg){
         this.leftArg=leftArg;
         this.operator=operator;
         this.rightArg=rightArg;

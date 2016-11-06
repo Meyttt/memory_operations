@@ -40,6 +40,42 @@
                     <operation left="left" operator="-}" right="right"/>
                     <operation left="left" operator="/-}/" right="right"/>
                 </edge>
+				<edge end = "4">
+					<predicate>
+						<const>true</const>
+					</predicate>
+					<operation left="left" operator="-}" right="right"/>
+					<operation left="left" operator="/-}/" right="right"/>
+				</edge>
             </arm>
+			<arm begin = "2">
+				<edge end = "1">
+					<predicate>
+						<alphabet>AlphabetName1</alphabet>
+					</predicate>
+					<operation left="left" operator="/-}" right="right"/>
+				</edge>
+				<edge end = "2">
+					<predicate>
+						<predicateText>PredicateText1</predicateText>
+					</predicate>
+					<operation left="left" operator="{-" right="right"/>
+					<operation left="left" operator="-}/" right="right"/>
+				</edge>
+				<edge end = "3">
+					<predicate>
+						<const>true</const>
+					</predicate>
+					<operation left="left" operator="-}" right="right"/>
+					<operation left="left" operator="/-}/" right="right"/>
+				</edge>
+				<edge end = "4">
+					<predicate>
+						<const>true</const>
+					</predicate>
+					<operation left="left" operator="-}" right="right"/>
+					<operation left="left" operator="/-}/" right="right"/>
+				</edge>
+			</arm>
 		</alg>
 	</r-pro>

@@ -79,6 +79,9 @@ public class AlgorithmReader {
 
         NodeList nodeList = document.getElementsByTagName("arm");
         for(int i=0;i<nodeList.getLength();i++){
+            ArrayList<ArmLine> armLines=new ArrayList<>();
+            Logic.Condition condition= null;
+            ArrayList<Statement> statements = new ArrayList<>();
             Node armNode= nodeList.item(i);
             String nodeNumber = armNode.getAttributes().getNamedItem("begin").getNodeValue();
             NodeList edges = armNode.getChildNodes();
@@ -88,9 +91,7 @@ public class AlgorithmReader {
                     String endNumber=edge.getAttributes().getNamedItem("end").getNodeValue();
                     NodeList allLines=edge.getChildNodes();
                         for(int k=0;k<allLines.getLength();k++){
-                            Logic.Condition condition;
                             Node line = allLines.item(k);
-                            ArrayList<Statement> statements = new ArrayList<>();
                             switch(line.getNodeName()){
                                 case("predicate"):
                                     NodeList lineNodes = line.getChildNodes();
@@ -116,20 +117,19 @@ public class AlgorithmReader {
                                 break;
                                 case("operation"):{
                                     NamedNodeMap atributes=line.getAttributes();
+                                    statements.add(new Statement(atributes.getNamedItem("left").getNodeValue(),
+                                            Statement.getOperator(atributes.getNamedItem("operator").getNodeValue().toCharArray()),atributes.getNamedItem("right").getNodeValue()));
 
                                 }
                             }
 
-                           // System.out.println(line.getNodeName());
-                            if(line.hasChildNodes()){
 
-                            }
                         }
-
+                        armLines.add(new ArmLine(nodeNumber,condition,statements));
                 }
             }
+            arms.put(nodeNumber,new Arm(nodeNumber,armLines));
         }
-
     return arms;
     }
 
