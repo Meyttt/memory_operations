@@ -6,6 +6,7 @@ import Memories.*;
 import Other.Storage;
 import Other.Tape;
 import com.sun.deploy.util.ArrayUtil;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.jcp.xml.dsig.internal.dom.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -166,7 +167,7 @@ public class AlgorithmReader {
             }
         }
     }
-
+        System.out.println(tape);
     return new Storage(arms,memoriesMap,alphabetMap,tape);
     }
 
